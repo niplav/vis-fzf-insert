@@ -45,7 +45,7 @@ vis:command_register("fzf", function(argv, force, win, selection, range)
         elseif output[1] == 'ctrl-v' then action = 'vsplit'
         end
 
-        vis:feedkeys(string.format("%s '%s'<Enter>", action, output[2]))
+        vis:feedkeys(string.format(":%s '%s'<Enter>", action, output[2]))
     elseif status == 1 then
         vis:info(
             string.format(

@@ -18,6 +18,15 @@ module.fzf_path = "fzf"
 module.fzf_args = ""
 
 vis:command_register("fzf", function(argv, force, win, selection, range)
+    local fzf_path = module.fzf_path
+    if argv[1] == "--search-path" then
+        table.remove(argv, 1)
+        local dir = table.remove(argv, 1)
+        fzf_path = (
+            [[FZF_DEFAULT_COMMAND="$FZF_DEFAULT_COMMAND --search-path ]] .. dir .. [[" fzf]]
+        )
+    end
+
     local command = string.gsub([[
             $fzf_path \
                 --header="Enter:edit,^s:split,^v:vsplit" \
@@ -25,7 +34,7 @@ vis:command_register("fzf", function(argv, force, win, selection, range)
                 $fzf_args $args
         ]],
         '%$([%w_]+)', {
-            fzf_path=module.fzf_path,
+            fzf_path=fzf_path,
             fzf_args=module.fzf_args,
             args=table.concat(argv, " ")
         }

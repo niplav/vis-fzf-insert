@@ -1,5 +1,3 @@
-**This project has a new home. Development continues at https://git.sr.ht/~mcepl/vis-fzf-open.**
-
 # Fuzzy find and open files in vis
 
 Use [fzf](https://github.com/junegunn/fzf) to open files in [vis](https://github.com/martanne/vis).
@@ -70,3 +68,9 @@ my_fzf_args = string.gsub([[
 -- Arguments passed to fzf (default: "")
 plugin_vis_open.fzf_args = my_fzf_args
 ```
+
+All issues, questions, complaints, or (even better!) patches
+should be send via email to
+[~mcepl/devel@lists.sr.ht](mailto:~mcepl/devel@lists.sr.ht) email
+list (for patches you may use [git
+send-email](https://git-send-email.io/)).

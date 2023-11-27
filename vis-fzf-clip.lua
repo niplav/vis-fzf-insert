@@ -17,11 +17,30 @@
 
 module = {}
 module.cmd_path = "fzf"
-module.cmd_args = ""
-module.paste_prefix = ""
-module.paste_postfix = ""
+module.cmd_args = {"--height=40%"}
+module.paste_prefix = {""}
+module.paste_postfix = {""}
 
 local clip_action = vis:action_register("clip", function(keys)
+    if #keys == 0 then
+        return -1
+    end
+
+    idx = tonumber(keys)
+    if keys == "[" then
+       idx = 1
+    elseif keys == "(" then
+       idx = 2
+    elseif idx == nil then
+        vis:info(
+            string.format(
+                "fzf-clip: Not a number",
+                status, command, status
+            )
+        )
+        return 1
+    end
+
     local cmd_path = module.cmd_path
 
     local command = string.gsub([[
@@ -29,7 +48,7 @@ local clip_action = vis:action_register("clip", function(keys)
         ]],
         '%$([%w_]+)', {
             cmd_path = cmd_path,
-            cmd_args = module.cmd_args
+            cmd_args = module.cmd_args[idx]
         }
     )
 
@@ -41,40 +60,39 @@ local clip_action = vis:action_register("clip", function(keys)
     local success, msg, status = file:close()
 
     if status == 0 then
-        vis:feedkeys(string.format("i%s%s%s<Escape>", module.paste_prefix[keys], output[1], module.paste_postfix[keys]))
+        vis:feedkeys(string.format("i%s%s%s", module.paste_prefix[idx], output[1], module.paste_postfix[idx]))
     elseif status == 1 then
         vis:info(
             string.format(
-                "clip-open: No match. Command %s exited with return value %i.",
+                "fzf-clip: No match. Command %s exited with return value %i.",
                 command, status
             )
         )
     elseif status == 2 then
         vis:info(
             string.format(
-                "clip-open: Error. Command %s exited with return value %i.",
+                "fzf-clip: Error. Command %s exited with return value %i.",
                 command, status
             )
         )
     elseif status == 130 then
         vis:info(
             string.format(
-                "clip-open: Interrupted. Command %s exited with return value %i",
+                "fzf-clip: Interrupted. Command %s exited with return value %i",
                 command, status
             )
         )
     else
         vis:info(
             string.format(
-                "clip-open: Unknown exit status %i. command %s exited with return value %i",
+                "fzf-clip: Unknown exit status %i. command %s exited with return value %i",
                 status, command, status
             )
         )
     end
 
     vis:feedkeys("<vis-redraw>")
-
-    return true;
+    return 1
 end, "Insert string from a file")
 
 vis:map(vis.modes.NORMAL, "[[", clip_action)

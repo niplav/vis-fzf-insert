@@ -1,5 +1,6 @@
 -- Copyright (C) 2017  Guillaume Chérel
 -- Copyright (C) 2023  Matěj Cepl
+-- Copyright (c) 2023  niplav
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -15,29 +16,20 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module = {}
-module.fzf_path = "fzf"
-module.fzf_args = ""
+module.cmd_path = "fzf"
+module.cmd_args = ""
+module.paste_prefix = ""
+module.paste_postfix = ""
 
-vis:command_register("fzf", function(argv, force, win, selection, range)
-    local fzf_path = module.fzf_path
-    if argv[1] == "--search-path" then
-        table.remove(argv, 1)
-        local dir = table.remove(argv, 1)
-        fzf_path = (
-            [[FZF_DEFAULT_COMMAND="$FZF_DEFAULT_COMMAND --search-path ]] .. dir .. [[" fzf]]
-        )
-    end
+local clip_action = vis:action_register("clip", function(keys)
+    local cmd_path = module.cmd_path
 
     local command = string.gsub([[
-            $fzf_path \
-                --header="Enter:edit,^s:split,^v:vsplit" \
-                --expect="ctrl-s,ctrl-v" \
-                $fzf_args $args
+            $cmd_path $cmd_args $args
         ]],
         '%$([%w_]+)', {
-            fzf_path=fzf_path,
-            fzf_args=module.fzf_args,
-            args=table.concat(argv, " ")
+            cmd_path = cmd_path,
+            cmd_args = module.cmd_args
         }
     )
 
@@ -49,38 +41,32 @@ vis:command_register("fzf", function(argv, force, win, selection, range)
     local success, msg, status = file:close()
 
     if status == 0 then
-        local action = 'e'
-
-        if     output[1] == 'ctrl-s' then action = 'split'
-        elseif output[1] == 'ctrl-v' then action = 'vsplit'
-        end
-
-        vis:feedkeys(string.format(":%s '%s'<Enter>", action, output[2]))
+        vis:feedkeys(string.format("i%s%s%s<Escape>", module.paste_prefix[keys], output[1], module.paste_postfix[keys]))
     elseif status == 1 then
         vis:info(
             string.format(
-                "fzf-open: No match. Command %s exited with return value %i.",
+                "clip-open: No match. Command %s exited with return value %i.",
                 command, status
             )
         )
     elseif status == 2 then
         vis:info(
             string.format(
-                "fzf-open: Error. Command %s exited with return value %i.",
+                "clip-open: Error. Command %s exited with return value %i.",
                 command, status
             )
         )
     elseif status == 130 then
         vis:info(
             string.format(
-                "fzf-open: Interrupted. Command %s exited with return value %i",
+                "clip-open: Interrupted. Command %s exited with return value %i",
                 command, status
             )
         )
     else
         vis:info(
             string.format(
-                "fzf-open: Unknown exit status %i. command %s exited with return value %i",
+                "clip-open: Unknown exit status %i. command %s exited with return value %i",
                 status, command, status
             )
         )
@@ -89,6 +75,8 @@ vis:command_register("fzf", function(argv, force, win, selection, range)
     vis:feedkeys("<vis-redraw>")
 
     return true;
-end, "Select file to open with fzf")
+end, "Insert string from a file")
+
+vis:map(vis.modes.NORMAL, "[[", clip_action)
 
 return module

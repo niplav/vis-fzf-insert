@@ -1,6 +1,6 @@
 -- Copyright (C) 2017  Guillaume Chérel
 -- Copyright (C) 2023  Matěj Cepl
--- Copyright (c) 2023  niplav
+-- Copyright (c) 2023-2024  niplav
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as

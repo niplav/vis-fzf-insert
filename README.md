@@ -16,16 +16,16 @@ Configuration
 Put the file `vis-fzf-insert.lua` into a plugin directory of vis (usually
 `/usr/share/vis/plugins/`). In visrc.lua:
 
-	plugin_vis_clip = require('plugins/vis-fzf-clip')
+	plugin_vis_insert = require('plugins/vis-fzf-insert')
 	file1="/usr/local/etc/wikititles" --These are just an example
 	file2="/usr/local/etc/texts_list"
-	plugin_vis_clip.cmd_args = {"--height=40% <"..file1, "--height=40% <"..file2}
+	plugin_vis_insert.cmd_args = {"--height=40% <"..file1, "--height=40% <"..file2}
 
 One can also specify prefixes and postfixes that get inserted after or
 before the line selected from the file:
 
-	plugin_vis_clip.paste_prefix = {"(https://en.wikipedia.org/wiki/", ""}
-	plugin_vis_clip.paste_postfix = {")", ""}
+	plugin_vis_insert.paste_prefix = {"(https://en.wikipedia.org/wiki/", ""}
+	plugin_vis_insert.paste_postfix = {")", ""}
 
 Here `"(https://en.wikipedia.org/wiki/"` is a prefix that applies to
 lines from the file `wikititles`, and `")"` is a postfix that applies
